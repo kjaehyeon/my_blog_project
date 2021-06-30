@@ -6,7 +6,8 @@ class Post(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    head_image = models.ImageField(upload_to='blog/images/%Y/%m/%d/', blank=True)
+    #blank=True는 해당 필드가 필수가 아니라는 의미
     def get_absolute_url(self):
         return f'/blog/{self.pk}/'
 

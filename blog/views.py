@@ -5,6 +5,7 @@ from . models import Post
 class PostList(ListView):
     model = Post
     ordering = '-pk' #최신순 포스팅
+
     #template_name = 'blog/post_list.html'
     #Post_list.html파일을 만들거나 template_name을 지정해준다.
 # def index(request):
