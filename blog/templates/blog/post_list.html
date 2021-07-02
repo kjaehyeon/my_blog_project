@@ -2,7 +2,7 @@
 {% load static %}
 <!-- static 파일을 사용하겠다고 선언함-->
 <head>
-    <title>Blog List</title>
+    <title>Blog</title>
     <link rel="stylesheet" href ="{% static 'blog/bootstrap/bootstrap.min.css' %}"  media="screen">
     <script src="https://kit.fontawesome.com/2141b63311.js" crossorigin="anonymous"></script>
 </head>
@@ -79,10 +79,11 @@
             </div>
         </div>
     </div>
-    <div class="container my-3">
+    <div class="container my-3" id="main-area">
         <div class="row">
             <div class="col-md-8 col-lg-9">
                 <h1>Blog</h1>
+                {%if post_list.exists %}
                 {% for p in post_list %}
                 <!-- Blog post-->
                 <div class="card mb-4">
@@ -104,7 +105,9 @@
                     </div>
                 </div>
                 {% endfor %}
-
+                {%else%}
+                <h3>아직 게시물이 없습니다.</h3>
+                {%endif%}
                 <nav aria-label="Pagination">
                     <hr class="my-0" />
                     <ul class="pagination justify-content-center my-4">
