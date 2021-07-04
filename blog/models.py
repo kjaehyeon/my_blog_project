@@ -14,6 +14,15 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = 'Categories'
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=200, unique=True, allow_unicode=True)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return f'/blog/tag/{self.slug}/'
 
 class Post(models.Model):
     title = models.CharField(max_length=30)
@@ -29,6 +38,8 @@ class Post(models.Model):
     author = models.ForeignKey(User, null=True, on_delete=models.SET_NULL) # 사용자 지워지면 포스트 작성자 null로 바뀜
     #author = models.ForeignKey(User, on_delete=models.CASCADE) CASCADE이면 사용자 지워질 때 글도 다 지워짐
     category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
+    tags = models.ManyToManyField(Tag, blank=True) #ManyToMany는 기본적으로 null=True이다.
+
     def get_absolute_url(self):
         return f'/blog/{self.pk}/'
     def get_file_name(self):

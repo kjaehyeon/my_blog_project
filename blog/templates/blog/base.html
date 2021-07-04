@@ -33,7 +33,7 @@
                 <div class="card-body">
                     <div class="row">
                         <ul class="list-inline">
-                            <a href="/blog/"> 전체 ({{post_list.count}})</a>
+                            <a href="/blog/"> 전체 ({{total_post_count}})</a>
                             {% for category in categories %}
                             <li>
                                 <a href="{{category.get_absolute_url}}">{{category}} ({{category.post_set.count}})</a>

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import ListView, DetailView
-from . models import Post, Category
+from . models import Post, Category, Tag
 
 
 class PostList(ListView):
@@ -11,6 +11,7 @@ class PostList(ListView):
         context = super(PostList, self).get_context_data()
         context['categories'] = Category.objects.all()
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        context['total_post_count'] = Post.objects.count()
         return context
     #template_name = 'blog/post_list.html'
     #Post_list.html파일을 만들거나 template_name을 지정해준다.
@@ -24,6 +25,26 @@ class PostList(ListView):
 #         'blog/post_list.html',
 #         {
 #             'posts' : posts,
+#         }
+#     )
+
+
+class PostDetail(DetailView):
+    model = Post
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(PostDetail, self).get_context_data()
+        context['categories'] = Category.objects.all()
+        context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        context['total_post_count'] = Post.objects.count()
+        return context
+# def single_post_page(request, pk):
+#     post = Post.objects.get(pk=pk)
+#
+#     return render(
+#         request,
+#         'blog/post_detail.html',
+#         {
+#             'post':post,
 #         }
 #     )
 
@@ -43,24 +64,22 @@ def category_page(request, slug):
             'categories': Category.objects.all(), #카테고리 위젯 채우기 위해 보내줌
             'no_category_post_count': Post.objects.filter(category=None).count(),
             'category': category, #페이지 타이틀 옆 카테고리 이름 알려준다.
+            'total_post_count': Post.objects.count(),
         }
     )
 
-class PostDetail(DetailView):
-    model = Post
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(PostDetail, self).get_context_data()
-        context['categories'] = Category.objects.all()
-        context['no_category_post_count'] = Post.objects.filter(category=None).count()
+def tag_page(request, slug):
+    tag = Tag.objects.get(slug=slug)
+    post_list = tag.post_set.all()
 
-        return context
-# def single_post_page(request, pk):
-#     post = Post.objects.get(pk=pk)
-#
-#     return render(
-#         request,
-#         'blog/post_detail.html',
-#         {
-#             'post':post,
-#         }
-#     )
+    return render(
+        request,
+        'blog/post_list.html',
+        {
+            'post_list': post_list,
+            'categories': Category.objects.all(), #카테고리 위젯 채우기 위해 보내줌
+            'no_category_post_count': Post.objects.filter(category=None).count(),
+            'total_post_count': Post.objects.count(),
+            'tag': tag,
+        }
+    )

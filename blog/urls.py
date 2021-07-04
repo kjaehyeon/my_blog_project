@@ -6,5 +6,6 @@ urlpatterns = [
    # path('<int:pk>/', views.single_post_page),
     path('', views.PostList.as_view()),
    # path('', views.index)
-    path('category/<str:slug>/', views.category_page)
+    path('category/<str:slug>/', views.category_page),
+    path('tag/<str:slug>/', views.tag_page)
 ]
