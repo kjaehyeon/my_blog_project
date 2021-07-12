@@ -1,5 +1,12 @@
 {%extends 'blog/base.html'%}
 {%block main_area%}
+
+{%if user.is_authenticated %}
+    {%if user.is_staff or user.is_superuser%}
+        <a class="btn btn-secondary btn-sm float-end" href="/blog/create_post/" role="button"><i class="fas fa-pencil-alt"></i>
+            &nbsp New Post</a>
+    {%endif%}
+{%endif%}
 <h1>Blog
     {%if category%}<span class="badge bg-secondary">{{category.name}}</span>{%endif%}
     {%if tag%}<span class="badge bg-light text-dark"><i class="fas fa-tags"></i>{{tag.name}} ({{tag.post_set.count}})</span>{%endif%}
@@ -13,13 +20,13 @@
                       alt="{{p}}head image" /></a>
     {%else%}
     <a href="{{p.get_absolute_url}}"><img class="card-img-top" src="https://picsum.photos/seed/{{p.id}}/850/500"
-                      alt="{{p}}head image" /></a>
+                                          alt="{{p}}head image" /></a>
     {%endif%}
     <div class="card-body">
         {%if p.category%}
-            <span class="badge bg-secondary float-end">{{p.category}}</span>
+        <span class="badge bg-secondary float-end">{{p.category}}</span>
         {%else%}
-            <span class="badge bg-secondary float-end">미분류</span>
+        <span class="badge bg-secondary float-end">미분류</span>
         {%endif%}
 
         <div class="small text-muted">{{p.created_at}} BY {{p.author}}</div>
@@ -33,10 +40,10 @@
         <p class="card-text">{{p.content | truncatewords:100}}</p>
 
         {%if p.tags.exists%}
-            <i class="fas fa-tags"></i>
-            {% for tag in p.tags.iterator%}
-                <a href='{{tag.get_absolute_url}}'><span class="badge bg-light text-dark">{{tag}}</span></a>
-            {%endfor%}
+        <i class="fas fa-tags"></i>
+        {% for tag in p.tags.iterator%}
+        <a href='{{tag.get_absolute_url}}'><span class="badge bg-light text-dark">{{tag}}</span></a>
+        {%endfor%}
         <br/>
         <br/>
         {%endif%}
