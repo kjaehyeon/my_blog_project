@@ -49,8 +49,6 @@ class Post(models.Model):
         return self.get_file_name().split('.')[-1]
     def __str__(self):
         return f'[{self.pk}]{self.title} :: {self.author}'
-    #author 추후작성
-
 
 
 

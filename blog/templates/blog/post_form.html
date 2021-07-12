@@ -9,6 +9,10 @@
      csrf_token : 웹사이트를 CSRF공격으로 부터 보호하기 위해 장고가 제공하는 기능-->
     <table>
       {{form}}
+      <tr>
+        <th><label for="id_tags_str">Tags:</label></th>
+        <td><input type="text" name="tags_str" id="id_tags_str"></td>
+      </tr>
     </table>
     <button type="submit" class="btn btn-primary float-end">Summit</button>
   </form>

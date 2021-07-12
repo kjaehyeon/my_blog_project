@@ -10,7 +10,7 @@ class TestView(TestCase):
         self.user_trump = User.objects.create(username='trump', password='somepassword')
         self.user_obama = User.objects.create(username='obama', password='somepassword')
 
-        self.user_obama.is_staff=True
+        self.user_obama.is_staff = True
         self.user_obama.save()
 
         self.category_programming = Category.objects.create(name='programming', slug='programming')
@@ -184,8 +184,8 @@ class TestView(TestCase):
         response = self.client.get('/blog/create_post/')
         self.assertNotEqual(response.status_code, 200)
 
-        # obama가 login하고 난 후후
-        self.client.login(username=self.user_obama.username, password='somepassword')
+        # obama가 login하고 난 후
+        self.client.login(username=self.post_003.author.username, password='somepassword')
         response = self.client.get('/blog/create_post/')
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -194,16 +194,26 @@ class TestView(TestCase):
         main_area = soup.find('div', id='main-area')
         self.assertIn('Create New Post', main_area.text)
 
+        tags_str_input = main_area.find('input', id='id_tags_str')
+        self.assertTrue(tags_str_input)
+
         # 포스트를 작성한 후 제출한 경우
         self.client.post(
             '/blog/create_post/',
-            {'title': 'Post form 만들기',
-             'content': "Post form 페이지를 만듭시다.",
-             }
+            {
+                'title': 'Post form 만들기',
+                'content': "Post form 페이지를 만듭시다.",
+                'tags_str': "New Tag; 한글태그, python"
+            }
         )
         last_post = Post.objects.last()
         self.assertEqual(last_post.title, 'Post form 만들기')
         self.assertEqual(last_post.author.username, 'trump')
+
+        self.assertIn(last_post.tags.count(), 3)
+        self.assertTrue(Tag.objects.get(name='New Tag'))
+        self.assertTrue(Tag.objects.get(name='한글태그'))
+        self.assertEqual(Tag.objects.count(), 5)
 
     def test_update_test(self):
         update_post_url = f'/blog/update_post/{self.post_003.pk}/'
@@ -218,7 +228,7 @@ class TestView(TestCase):
         self.assertEqual(response.status_code, 403)
 
         #작성자가 접근하는 경우
-        self.client.login(username=self.user_obama.username, password='somepassword')
+        self.client.login(username=self.post_003.author.username, password='somepassword')
         response = self.client.get(update_post_url)
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
@@ -227,12 +237,18 @@ class TestView(TestCase):
         main_area = soup.find('div', id='main-area')
         self.assertIn('Edit Post', main_area.text)
 
+        tags_str_input = main_area.find('input', id='id_tags_str')
+        self.assertTrue(tags_str_input)
+        self.assertIn('파이썬 공부;한글태그, some tag', tags_str_input.attrs['value'])
+
+
         response = self.client.post(
             update_post_url,
             {
                 'title' : '세번째 포스트 수정',
                 'content' : '수정완료',
-                'category' : self.category_music.pk
+                'category' : self.category_music.pk,
+                'tags_str' : '파이썬 공부;한글태그, some tag'
             },
             follow=True
         )
@@ -241,3 +257,6 @@ class TestView(TestCase):
         self.assertIn('세번째 포스트 수정', main_area.text)
         self.assertIn('수정완료', main_area.text)
         self.assertIn(self.category_music.name, main_area.text)
+        self.assertIn('파이썬 공부', main_area.text)
+        self.assertIn('한글태그', main_area.text)
+        self.assertIn('some tag', main_area.text)
