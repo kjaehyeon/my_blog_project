@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
 from .models import Post, Category, Tag
 
+
 class TestView(TestCase):
     def setUp(self):
         self.client = Client()
@@ -46,7 +47,6 @@ class TestView(TestCase):
                       category_card.text)
         self.assertIn(f'미분류 (1)', category_card.text)
 
-
     def test_post_list(self):
         # 포스트가 있는 경우
         self.assertEqual(Post.objects.count(), 3)
@@ -85,7 +85,7 @@ class TestView(TestCase):
         self.assertIn(self.user_obama.username, main_area.text)
         self.assertIn(self.user_trump.username, main_area.text)
 
-        #포스트가 없는 경우
+        # 포스트가 없는 경우
         Post.objects.all().delete()
         self.assertEqual(Post.objects.count(), 0)
         response = self.client.get('/blog/')
@@ -95,34 +95,33 @@ class TestView(TestCase):
         self.assertIn('아직 게시물이 없습니다.', main_area.text)
 
     def test_post_detail(self):
-        #1.1 포스트가 하나 있다.
-        #1.2 포스트의 url은 '/blog/1/'이다
+        # 1.1 포스트가 하나 있다.
+        # 1.2 포스트의 url은 '/blog/1/'이다
         self.assertEqual(self.post_001.get_absolute_url(), '/blog/1/')
 
-        #2 포스트의 상세페이지 테스트
-        #2.1 첫번째 포스트의 url로 접근하면 정상작동한다.
+        # 2 포스트의 상세페이지 테스트
+        # 2.1 첫번째 포스트의 url로 접근하면 정상작동한다.
         response = self.client.get(self.post_001.get_absolute_url())
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
-        #2.2 포스트 목록 페이지와 같은 네비게이션 바가 있다.
+        # 2.2 포스트 목록 페이지와 같은 네비게이션 바가 있다.
         self.nav_bar_test(soup)
         self.category_card_test(soup)
-        #2.3 첫번째 포스트의 제목이 브라우저 탭 타이틀에 있다.
-        self.assertIn(self.post_001.title,soup.title.text)
-        #2.4 첫 번째 포스트의 제목이 post_area에 있다.
+        # 2.3 첫번째 포스트의 제목이 브라우저 탭 타이틀에 있다.
+        self.assertIn(self.post_001.title, soup.title.text)
+        # 2.4 첫 번째 포스트의 제목이 post_area에 있다.
         main_area = soup.find('div', id='main-area')
         post_area = main_area.find('div', id='post-area')
         self.assertIn(self.post_001.title, post_area.text)
         self.assertIn(self.category_programming.name, post_area.text)
-        #2.5 첫번째 포스트의 작성자가 포스트 영역에 있다.
+        # 2.5 첫번째 포스트의 작성자가 포스트 영역에 있다.
         self.assertIn(self.post_001.author.username, post_area.text)
-        #2.6 첫번째 포스트의 내용이 포스트 영역에 있다.
+        # 2.6 첫번째 포스트의 내용이 포스트 영역에 있다.
         self.assertIn(self.post_001.content, post_area.text)
 
         self.assertIn(self.tag_hello.name, main_area.text)
         self.assertNotIn(self.tag_python_kor.name, main_area.text)
         self.assertNotIn(self.tag_python.name, main_area.text)
-
 
     def nav_bar_test(self, soup):
         navbar = soup.nav
@@ -130,7 +129,7 @@ class TestView(TestCase):
         self.assertIn('About Me', navbar.text)
 
         logo_btn = navbar.find('a', text='Do it Django')
-        self.assertEqual(logo_btn.attrs['href'] ,'/')
+        self.assertEqual(logo_btn.attrs['href'], '/')
 
         home_btn = navbar.find('a', text='Home')
         self.assertEqual(home_btn.attrs['href'], '/')
@@ -171,3 +170,30 @@ class TestView(TestCase):
         self.assertIn(self.post_001.title, main_area.text)
         self.assertNotIn(self.post_002.title, main_area.text)
         self.assertNotIn(self.post_003.title, main_area.text)
+
+    def test_create_post(self):
+        # login하지 않은 상태
+        response = self.client.get('/blog/create_post/')
+        self.assertNotEqual(response.status_code, 200)
+
+        # login하고 난 후
+        self.client.login(username='trump', password='somepassword')
+
+        response = self.client.get('/blog/create_post/')
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertEqual('Create Post - Blog', soup.title.text)
+        main_area = soup.find('div', id='main-area')
+        self.assertIn('Create New Post', main_area.text)
+
+        # 포스트를 작성한 후 제출한 경우
+        self.client.post(
+            '/blog/create_post/',
+            {'title': 'Post form 만들기',
+             'content': "Post form 페이지를 만듭시다.",
+             }
+        )
+        last_post = Post.objects.last()
+        self.assertEqual(last_post.title, 'Post form 만들기')
+        self.assertEqual(last_post.author.username, 'trump')

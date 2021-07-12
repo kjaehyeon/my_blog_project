@@ -12,7 +12,7 @@
     <a href="#!"><img class="card-img-top" src="{{p.head_image.url}}"
                       alt="{{p}}head image" /></a>
     {%else%}
-    <a href="#!"><img class="card-img-top" src="https://picsum.photos/seed/{{p.id}}/850/500"
+    <a href="{{p.get_absolute_url}}"><img class="card-img-top" src="https://picsum.photos/seed/{{p.id}}/850/500"
                       alt="{{p}}head image" /></a>
     {%endif%}
     <div class="card-body">
