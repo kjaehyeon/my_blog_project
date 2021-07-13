@@ -107,7 +107,7 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         if current_user.is_authenticated and (current_user.is_superuser or current_user.is_staff):  # 로그인 한 상태인지 검사
             form.instance.author = current_user  # form에서 생성한 instance의 author필드에 current user를 담는다.
             response = super(PostCreate, self).form_valid(form)
-
+            #Post와 Tag는 다대다 관계이므로 db에 Post레코드가 존재해야한다. 그래서 CreateView의 form_valid함수를 사용하고 결과를 response에 저장해둠
             tags_str = self.request.POST.get('tags_str') #post방식으로 전달된 정보 중 name이 tags_str인 input의 값을 가져온다.
             if tags_str:
                 tags_str = tags_str.strip()

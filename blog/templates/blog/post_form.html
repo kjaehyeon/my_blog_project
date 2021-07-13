@@ -1,4 +1,5 @@
 {% extends 'blog/base_full_width.html' %}
+{% load crispy_forms_tags %}
 {% block head_title %}Create Post - Blog{% endblock %}
 {% block main_area %}
   <h1>Create New Post</h1>
@@ -7,13 +8,13 @@
     <!--method : 서버로 값을 보내는 방식 결정 GET과 POST가 있다.
      enctype="multipart/form-data" : 파일도 같이 보내겠다는 의미
      csrf_token : 웹사이트를 CSRF공격으로 부터 보호하기 위해 장고가 제공하는 기능-->
-    <table>
-      {{form}}
-      <tr>
-        <th><label for="id_tags_str">Tags:</label></th>
-        <td><input type="text" name="tags_str" id="id_tags_str"></td>
-      </tr>
-    </table>
+    {{form | crispy}}
+    <div id="div_id_tags_str">
+      <label for="id_tags_str">Tags:</label>
+      <input type="text" name="tags_str" id="id_tags_str" class="textinput textInput form-control">
+    </div>
+    <br/>
     <button type="submit" class="btn btn-primary float-end">Summit</button>
   </form>
+  {{form.media}}
 {%endblock%}

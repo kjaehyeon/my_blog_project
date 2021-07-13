@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from markdownx.models import MarkdownxField
+from markdownx.utils import markdown
 import os
 
 class Category(models.Model):
@@ -26,7 +28,7 @@ class Tag(models.Model):
 
 class Post(models.Model):
     title = models.CharField(max_length=30)
-    content = models.TextField()
+    content = MarkdownxField()
     hook_text = models.CharField(max_length=100, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -47,6 +49,8 @@ class Post(models.Model):
         #return self.file_upload.name 이렇게 하면 경로가 다 나온다.
     def get_file_ext(self):
         return self.get_file_name().split('.')[-1]
+    def get_content_markdown(self):
+        return markdown(self.content)
     def __str__(self):
         return f'[{self.pk}]{self.title} :: {self.author}'
 

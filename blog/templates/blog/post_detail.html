@@ -42,7 +42,7 @@
         <!-- Post content-->
         <hr/>
         <section class="mb-5">
-            <p>{{post.content}}</p>
+            <p>{{post.get_content_markdown | safe}}</p>
             {%if post.file_upload%}
             <a href="{{post.file_upload.url}}" class="btn btn-outline-dark" download="true">
                 Download:
