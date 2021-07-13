@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import User
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 
 
 class TestView(TestCase):
@@ -40,6 +40,12 @@ class TestView(TestCase):
         )
         self.post_003.tags.add(self.tag_python_kor)
         self.post_003.tags.add(self.tag_python)
+
+        self.comment_001 = Comment.objects.create(
+            post=self.post_001,
+            content='첫번째 댓글',
+            author=self.user_obama
+        )
 
     def category_card_test(self, soup):
         category_card = soup.find('div', id='category-card')
@@ -125,6 +131,12 @@ class TestView(TestCase):
         self.assertIn(self.tag_hello.name, main_area.text)
         self.assertNotIn(self.tag_python_kor.name, main_area.text)
         self.assertNotIn(self.tag_python.name, main_area.text)
+
+        #comment area
+        comment_area= soup.find('section', id='comment-area')
+        comment_001_area = comment_area.find('div', id='comment-1')
+        self.assertIn(self.comment_001.author.username, comment_001_area.text)
+        self.assertIn(self.comment_001.content, comment_001_area.text)
 
     def nav_bar_test(self, soup):
         navbar = soup.nav
@@ -260,3 +272,5 @@ class TestView(TestCase):
         self.assertIn('파이썬 공부', main_area.text)
         self.assertIn('한글태그', main_area.text)
         self.assertIn('some tag', main_area.text)
+
+
