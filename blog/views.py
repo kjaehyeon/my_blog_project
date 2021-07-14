@@ -12,6 +12,7 @@ from .forms import CommentForm
 class PostList(ListView):
     model = Post
     ordering = '-pk'  # 최신순 포스팅
+    paginate_by = 3
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(PostList, self).get_context_data()
@@ -204,12 +205,23 @@ class CommentUpdate(LoginRequiredMixin, UpdateView):
         else:
             raise PermissionDenied
 
+
 def delete_comment(request, pk):
     comment = get_object_or_404(Comment, pk=pk)
     post = comment.post
 
-    if request.user.is_authenticated and comment.author==request.user:
+    if request.user.is_authenticated and comment.author == request.user:
         comment.delete()
         return redirect(post.get_absolute_url())
+    else:
+        raise PermissionDenied
+
+
+def delete_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+
+    if request.user.is_authenticated and post.author == request.user:
+        post.delete()
+        return redirect('/blog/')
     else:
         raise PermissionDenied
