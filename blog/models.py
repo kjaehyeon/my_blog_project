@@ -68,6 +68,12 @@ class Comment(models.Model):
     def get_absolute_url(self):
         return f'{self.post.get_absolute_url()}#comment-{self.pk}'
 
+    def get_avatar_url(self):
+        if self.author.socialaccount_set.exists():
+            return self.author.socialaccount_set.first().get_avatar_url()
+        else:
+            return "https://avatars.dicebear.com/api/gridy/"+self.author.username+".svg"
+
     def __str__(self):
         return f'[{self.pk}]{self.author}::{self.content}'
 

@@ -11,6 +11,7 @@
 <h1>Blog
     {%if category%}<span class="badge bg-secondary">{{category.name}}</span>{%endif%}
     {%if tag%}<span class="badge bg-light text-dark"><i class="fas fa-tags"></i>{{tag.name}} ({{tag.post_set.count}})</span>{%endif%}
+    {%if search_info%}<span class="badge bg-light text-dark">{{search_info}}</span>{%endif%}
 </h1>
 {%if post_list.exists %}
 {% for p in post_list %}
@@ -54,7 +55,11 @@
 </div>
 {% endfor %}
 {%else%}
-<h3>아직 게시물이 없습니다.</h3>
+    {%if search_info %}
+        <h3>검색 결과가 없습니다.</h3>
+    {%else%}
+        <h3>아직 게시물이 없습니다.</h3>
+    {%endif%}
 {%endif%}
 
 {% if is_paginated %}

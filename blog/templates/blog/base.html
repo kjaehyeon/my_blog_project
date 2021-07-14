@@ -5,6 +5,20 @@
     <title>{%block head_title%}Blog{%endblock%}</title>
     <link rel="stylesheet" href ="{% static 'blog/bootstrap/bootstrap.min.css' %}"  media="screen">
     <script src="https://kit.fontawesome.com/2141b63311.js" crossorigin="anonymous"></script>
+    <script>
+        function searchPost(){
+            let search_val = document.getElementById('search-input').value.trim();
+            if(search_val.length > 1)
+                location.href="/blog/search/"+search_val+"/";
+            else
+                alert("검색어가 너무 짧습니다.")
+        };
+
+        document.getElementById("search-input").addEventListener('keyup', function (event) {
+            if(event.key === 'Enter')
+                searchPost();
+        });
+    </script>
 </head>
 
 <body>
@@ -16,14 +30,14 @@
             {%endblock%}
         </div>
         <div class="col-md-4 col-lg-3">
-            <!-- Side widgets-->
+            <!-- Search widgets-->
             <div class="card mb-4">
                 <div class="card-header">Search</div>
                 <div class="card-body">
                     <div class="input-group">
                         <input class="form-control" type="text" placeholder="Enter search term..."
-                               aria-label="Enter search term..." aria-describedby="button-search" />
-                        <button class="btn btn-primary" id="button-search" type="button">Go!</button>
+                               aria-label="Enter search term..." aria-describedby="button-search" id="search-input"/>
+                        <button class="btn btn-primary" id="button-search" type="button" onclick="searchPost()">Go!</button>
                     </div>
                 </div>
             </div>
