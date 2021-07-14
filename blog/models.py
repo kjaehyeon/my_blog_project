@@ -69,7 +69,7 @@ class Comment(models.Model):
         return f'{self.post.get_absolute_url()}#comment-{self.pk}'
 
     def __str__(self):
-        return f'{self.author}::{self.content}'
+        return f'[{self.pk}]{self.author}::{self.content}'
 
 
 

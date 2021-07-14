@@ -62,10 +62,10 @@ class PostDetail(DetailView):
 def category_page(request, slug):
     if slug == 'no_category':
         category = '미분류'
-        post_list = Post.objects.filter(category=None)
+        post_list = Post.objects.filter(category=None).order_by('-pk')
     else:
         category = Category.objects.get(slug=slug)
-        post_list = Post.objects.filter(category=category)
+        post_list = Post.objects.filter(category=category).order_by('-pk')
 
     return render(
         request,
@@ -82,8 +82,7 @@ def category_page(request, slug):
 
 def tag_page(request, slug):
     tag = Tag.objects.get(slug=slug)
-    post_list = tag.post_set.all()
-
+    post_list = tag.post_set.all().order_by('-pk')
     return render(
         request,
         'blog/post_list.html',
@@ -204,3 +203,13 @@ class CommentUpdate(LoginRequiredMixin, UpdateView):
             return super(CommentUpdate, self).dispatch(request, *args, **kwargs)
         else:
             raise PermissionDenied
+
+def delete_comment(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    post = comment.post
+
+    if request.user.is_authenticated and comment.author==request.user:
+        comment.delete()
+        return redirect(post.get_absolute_url())
+    else:
+        raise PermissionDenied
